@@ -11,5 +11,5 @@ helm repo update
 
 To install the K8s informer
 ```
-helm install -n k8s-informer-<YOUR INSTANCE NAME> --set instance.name=<YOUR INSTANCE NAME> --set clusterName="<YOUR CLUSTER NAME>" k8s-informer servicenow-itom/k8s-informer-chart
+helm install -n <YOUR CHOSEN NAMESPACE> --set instance.name=<YOUR INSTANCE NAME> --set clusterName="<YOUR CLUSTER NAME>" k8s-informer servicenow-itom/k8s-informer-chart
 ```
