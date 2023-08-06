@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-informer-{{ .Values.instance.name }}
+  labels:
+    app: k8s_informer-{{ .Values.instance.name }}
+spec:
+  selector:
+    matchLabels:
+      app: k8s_informer-{{ .Values.instance.name }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: k8s_informer-{{ .Values.instance.name }}
+    spec:
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      serviceAccountName: {{ .Values.serviceAccount }}
+      securityContext:
+        runAsNonRoot: true
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecret }}
+      containers:
+      - command:
+        - /k8s_informer
+        args: ["--kubeconfig", "in_cluster", "--standalone", "true"]
+        {{ if .Values.useDebugImage }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}_debug"
+        {{ else }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        {{ end }}
+        name: k8sinformer
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: CLUSTER_NAME
+          value: "{{ .Values.clusterName }}"
+        - name: RESYNC_MIN
+          value: "{{ .Values.resyncMin }}"
+        - name: SEND_INTERVAL_SEC
+          value: "{{ .Values.sendIntervalSec }}"
+        - name: MAX_CI_IN_MESSAGE
+          value: "{{ .Values.maxCiInMessage }}"
+        - name: REFRESH_TIME_MIN
+          value: "{{ .Values.refreshTimeMin }}"
+        - name: FULL_DISCOVERY_MIN
+          value: "{{ .Values.fullDiscoveryMin }}"
+        - name: READ_COMMAND_SEC
+          value: "{{ .Values.readCommandSec }}"
+        - name: HEARTBEAT_MIN
+          value: "{{ .Values.heartbeatMin }}"
+        - name: MAX_QUEUE_SIZE_BYTES
+          value: "{{ .Values.maxQueueSizeBytes }}"
+        - name: MAX_RETRY
+          value: "{{ .Values.maxRetry }}"
+        - name: MAX_ECC_PAYLOAD_SIZE_BYTES
+          value: "{{ .Values.maxEccPayloadSizeBytes }}"
+        - name: PROXY_URL
+          value: "{{ .Values.proxyUrl }}"
+        - name: INSTANCE_URL
+          value: "https://{{ .Values.instance.name }}.{{ .Values.instance.domain }}"
+        - name: INSTANCE_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.instanceCredSecretName }}-{{ .Values.instance.name }}
+              key: user
+        - name: INSTANCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.instanceCredSecretName }}-{{ .Values.instance.name }}
+              key: password
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CONTINUOUS_DISCOVERY
+          value: "{{ .Values.continuousDiscovery }}"
+        - name: ECC_SENDER_INTERVAL_SEC
+          value: "{{ .Values.eccSenderIntervalSec }}"
+        - name: MAX_ELAPSED_TIME_MS
+          value: "{{ .Values.maxElapsedTimeMs }}"
+        - name: VERBOSE_LOGGING
+          value: "{{ .Values.verboseLogging }}"
+        - name: INFORMER_VERSION
+          value: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        resources:
+          limits:
+            cpu: {{ .Values.cpuLimit }}
+          requests:
+            cpu:  {{ .Values.cpuRequest }}
+            memory: {{ .Values.memoryRequest }}
+      terminationGracePeriodSeconds: 10

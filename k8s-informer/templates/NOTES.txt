@@ -1,0 +1,15 @@
+Thank you for installing {{ .Chart.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }} --namespace {{ .Release.Namespace }}
+  $ helm get all {{ .Release.Name }} --namespace {{ .Release.Namespace }}
+
+To check the k8s-informer pod is running, run:
+
+export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app=k8s_informer-{{ .Values.instance.name }}" -o jsonpath="{.items[0].metadata.name}")
+kubectl get pod $POD_NAME --namespace {{ .Release.Namespace }} 
+
+To see the k8s-informer logs, run:
+export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app=k8s_informer-{{ .Values.instance.name }}" -o jsonpath="{.items[0].metadata.name}")
+kubectl logs -f $POD_NAME --namespace {{ .Release.Namespace }} 

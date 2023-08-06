@@ -1,0 +1,86 @@
+# Default values for k8s-informer-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# The image of the informer program. Change this value if you place the image in your company repository
+image:
+  repository: registry-snapshots.devsnc.com/informer
+  pullPolicy: Always
+  tag: "1.0.0-SNAPSHOT"
+
+# The service account and role used by the informer program when calling the API server. It should have read access
+# to namespaces, nodes, deployments, replicasets, daemonsets, statefulsets, jobs, cronjobs, pods, services and endpoints
+serviceAccount: servicenow
+clusterRole: servicenow
+
+# The instance to which the informer reports to
+instance:
+  name: myinstance
+  domain: service-now.com
+
+# If the image is stored in a private repo, the secret name that holds the repo token should be in this secret within the same namespace
+imagePullSecret: k8s-informer-repo-cred
+
+# the Kubernetes cluster name as should be reflected in the CMDB
+clusterName: "My Cluster"
+
+# How frequently in minutes by which the informer calls the API server and list all relevant resources. 0 means only during initialization
+resyncMin: 0
+
+# The time window in seconds for accumulating changes arriving from the API server before preparing payload to be sent to the instance
+sendIntervalSec: 10
+
+# The interval (in seconds) in which the ECC sender may insert records to the ECC queue
+eccSenderIntervalSec: 30
+
+# when the elapsed time of sending ECC message exceeds this number, the informer will assume the instance is loaded and will back off
+maxElapsedTimeMs: 10000
+
+# The maximum number of items in a single accumulated payload. When we reach this number, we prepare the payload for sending and start a new payload
+maxCiInMessage: 50
+
+# If the time between now and the last time the item was reported exceeds this value, we re-send it even if there was no change. 0 means no refresh of idetical items
+refreshTimeMin: 0
+
+# The time interval in minutes for sending to the instance a full inventory of items
+fullDiscoveryMin: 1440
+
+# The time interval in seconds during which the informer looks for command coming from the instance
+readCommandSec: 60
+
+# The time interval for sending a payload of the cluster CI, if no other change has happened. Relevant only to the standalone mode
+heartbeatMin: 5
+
+# If access from the cluster to the internet requires a proxy, the proxy URL should be in the format http://proxy_host:proxy_port
+proxyUrl:
+
+# The max allowed size of the in-memory queue holding outgoing messages to the instance in standalone mode. If the queue is overflowed, we start to drop messages
+maxQueueSizeBytes: 104755200
+
+# The retry count on failues to send messages to the instance in standalone mode. If we exceed this number, the message is dropped
+maxRetry: 5
+
+# The maximum size of the payload on a single ECC input message. Relevant to the standalone mode only.
+maxEccPayloadSizeBytes: 1048576
+
+# Should the informer report to the instance on changes in real-time mode. If false, the informer will report only during full-discovery.
+continuousDiscovery: true
+
+# Should we use the debug version of the base distroless image. This might be needed during testing or debugging when shell access is required
+useDebugImage: false
+
+# The secret holding the instance credentials. keys are user and password
+instanceCredSecretName: k8s-informer-cred
+
+# CPU requests and limit
+cpuLimit: 500m
+cpuRequest: 100m
+
+# Memory requests
+memoryRequest: 200Mi
+
+# dnsPolicy. See options in https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+dnsPolicy: Default
+
+# When true, the informer prints messages per every object processed
+verboseLogging: false
