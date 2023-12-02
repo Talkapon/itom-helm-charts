@@ -12,6 +12,6 @@ entries:
     name: k8s-informer-chart
     type: application
     urls:
-    - https://install.service-now.com/glide/distribution/builds/package/informer/1.0.2/informer-helm-1.0.2.tgz/k8s-informer-chart-0.1.0.tgz
+    - https://install.service-now.com/glide/distribution/builds/package/informer/1.0.2/informer-helm-1.0.2.tgz
     version: 1.0.2
 generated: "2023-12-02T06:47:01.228539+02:00"
